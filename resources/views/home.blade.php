@@ -1,132 +1,289 @@
-@extends('hrms.layouts.base')
+@extends('layouts.app')
+
 @section('content')
-    <!-- START CONTENT -->
-    <div class="content">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="allcp-form top-buffer">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="section">
-                                <label for="comment" class="field prepend-icon">
-                          <textarea class="gui-textarea br-b-l-r0 br-b-r-r0" id="status" name="status"
-                                    placeholder="Share your status in 270 characters"
-                                    style="padding-left:100px"></textarea>
-                                    <label for="comment" class="field-icon">
-                                        <img src="{{isset(\Auth::user()->employee) ? \Auth::user()->employee->photo : '/assets/img/avatars/profile_pic.png'}}"
-                                             width="80px" height="80px" style="padding-top: 10px; padding-left: 8px"
-                                             class="img-responsive">
-                                    </label>
-                                    <div class="input-footer br-b-l-r3 br-b-r-r3">
-                                        <div style="padding-left:90%" id="post-button">
-                                            <input type="button" class="btn btn-success" id="post-update" value="Post">
-                                        </div>
-                                    </div>
-                                </label>
+    <!-- PAGE-HEADER -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Dashboard</h1>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+            </ol>
+        </div>
+        @can('admin-access')
+        <div class="ml-auto pageheader-btn">
+            <a href="{{ route('attendance.upload') }}" class="btn btn-primary btn-icon text-white mr-2">
+									<span>
+										<i class="fe fe-plus"></i>
+									</span> Attendance Upload file
+            </a>
+
+        </div>
+        @endcan
+    </div>
+    <!-- PAGE-HEADER END -->
+
+    <div class="row">
+        <div class="col-xl-3 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Total Employees</p>
+                            <h3 class="mb-0 number-font">{{ $totalUsers }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fe fe-users text-orange"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                @foreach($posts as $post)
-                    <div class="col-md-12">
-                        <div class="allcp-form append-post">
-                            <div class="row">
-                                <div class="panel">
-                                    <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-md-2">
-                                                @if(\Auth::user()->employee->photo)
-                                                    <img src="http://alliance-html.themerex.net/assets/img/avatars/profile_avatar.jpg"
-                                                         width="80px"
-                                                         height="80px">
-                                                    <br/>
-                                                    <div class="small-help-block"> {{\Auth::user()->name}}</div>
-                                                @else
-                                                    <img src="/assets/img/avatars/profile_pic.png" width="80px"
-                                                         height="80px">
-                                                    <br/>
-                                                    <div class="small-help-block"> {{\Auth::user()->name}}</div>
-                                                @endif
-                                            </div>
-                                            <div class="col-md-10">
-                                                <strong>{{$post->status}}</strong>
-                                                <div class="small-help-block">{{formatDate($post->created_at)}}</div>
-                                            </div>
-                                        </div>
-                                        <hr/>
-                                        <div class="container-for-reply-{{$post->id}}">
-                                            @foreach($post->replies as $reply)
-                                                <div class="row">
-                                                    <div class="col-md-2">
-                                                        <img src="{{getUserData($reply->user_id)['employee']['photo']}}"
-                                                             width="80px"
-                                                             height="80px">
-                                                        <div class="small-help-block"> {{getUserData($reply->user_id)['name']}}</div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        {{$reply->message}}
-                                                        <div class="small-help-block">{{formatDate($reply->created_at)}}</div>
-                                                    </div>
-                                                </div>
-                                                <hr/>
-                                            @endforeach
-                                        </div>
-                                        <!-- reply box -->
-                                        <div class="section">
-                                            <label for="comment" class="field prepend-icon">
-                          <textarea class="gui-textarea br-b-l-r0 br-b-r-r0 reply" name="status"
-                                    placeholder="Type your reply in 360 characters"
-                                    style="padding-left:100px"></textarea>
-                                                <label for="comment" class="field-icon">
-                                                    <img src="http://alliance-html.themerex.net/assets/img/avatars/profile_avatar.jpg"
-                                                         width="80px" height="80px"
-                                                         style="padding-top: 10px; padding-left: 8px">
-                                                </label>
-                                                <div class="input-footer br-b-l-r3 br-b-r-r3">
-                                                    <div style="padding-left:85%" class="reply-button">
-                                                        <input type="button" class="btn btn-success post-reply"
-                                                               data-post_id="{{$post->id}}" value="Reply">
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                        <!-- /reply box -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
             </div>
-            {{--<div class="col-md-4 pull-right top-buffer">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Suggested updates
-                    </div>
-                    <div class="panel-body">
-                        @foreach($suggestions as $suggestion)
-                            <div class="row">
-                                <div class="col-md-2">
-                                    @if(Auth::user()->employee->photo)
-                                        <img src="{{\Auth::user()->employee->photo}}" width="80px"
-                                             height="80px">
-                                        <div class="small-help-block"> {{getUserData($suggestion->user_id)['name']}}</div>
-                                    @else
-                                        <img src="/assets/img/avatars/profile_pic.png" width="80px"
-                                             height="80px">
-                                        <div class="small-help-block"> {{getUserData($suggestion->user_id)['name']}}</div>
-                                    @endif
-                                </div>
-                                <div class="col-md-8 pull-right">
-                                    <a href="/post/{{$suggestion->id}}">{{substr($suggestion->status, 0, 40)}}...</a>
-                                </div>
+        </div>
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">@php echo date('F'); @endphp Working Hours </p>
+                            <h3 class="mb-0 number-font">{{ $totalWorkingHours }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-won text-orange"></i>
                             </div>
-                            <hr/>
-                        @endforeach
+                        </div>
                     </div>
                 </div>
-            </div>--}}
+            </div>
         </div>
     </div>
-    <!-- END CONTENT -->
+
+    <div class="row">
+
+        @if(auth()->user()->hasRole('admin'))
+
+            <div class="col-xl-4 col-sm-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row mb-1">
+                            <div class="col">
+                                <p class="mb-1"> Sick Leaves</p>
+                                <h3 class="mb-0 number-font">{{ $userLeaveCounts['Sick Leave'] }}</h3>
+                            </div>
+                            <div class="col-auto mb-0">
+                                <div class="dash-icon">
+                                    <i class="fa fa-thermometer-three-quarters text-secondary1"></i>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-sm-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row mb-1">
+                            <div class="col">
+                                <p class="mb-1"> Casual Leaves</p>
+                                <h3 class="mb-0 number-font">{{$userLeaveCounts['Casual Leave']}}</h3>
+                            </div>
+                            <div class="col-auto mb-0">
+                                <div class="dash-icon">
+                                    <i class="fa fa-contao text-secondary"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-sm-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row mb-1">
+                            <div class="col">
+                                <p class="mb-1"> Annual Leaves</p>
+                                <h3 class="mb-0 number-font">{{$userLeaveCounts['Annual Leave']}}</h3>
+                            </div>
+                            <div class="col-auto mb-0">
+                                <div class="dash-icon">
+                                    <i class="fa fa-font text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+        {{-- Show leave counts for Sick Leave --}}
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Sick Leave (Total)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['total']['Sick Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-thermometer-three-quarters text-secondary1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Sick Leave (Remaining)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['remaining']['Sick Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-thermometer-three-quarters text-secondary1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Sick Leave (Taken)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['taken']['Sick Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-thermometer-three-quarters text-secondary1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Show leave counts for Casual Leave --}}
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Casual Leave (Total)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['total']['Casual Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-contao text-secondary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Casual Leave (Remaining)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['remaining']['Casual Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-contao text-secondary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Casual Leave (Taken)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['taken']['Casual Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-contao text-secondary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Show leave counts for Annual Leave --}}
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Annual Leave (Total)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['total']['Annual Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-font text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Annual Leave (Remaining)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['remaining']['Annual Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-font text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-1">
+                        <div class="col">
+                            <p class="mb-1">Annual Leave (Taken)</p>
+                            <h3 class="mb-0 number-font">{{ $leaveData['taken']['Annual Leave'] }}</h3>
+                        </div>
+                        <div class="col-auto mb-0">
+                            <div class="dash-icon">
+                                <i class="fa fa-font text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
+
 @endsection

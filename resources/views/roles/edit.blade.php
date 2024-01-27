@@ -1,0 +1,72 @@
+@extends('layouts.app')
+
+@push('styles')
+@endpush
+
+@section('content')
+    <!-- PAGE-HEADER -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Roles</h1>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{'/roles'}}">Roles</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Role</li>
+            </ol>
+        </div>
+    </div>
+    <!-- PAGE-HEADER END -->
+
+    <!-- ROW-2 OPEN -->
+    <div class="row">
+
+
+        <div class="col-lg-12">
+            @if (count($errors) > 0)
+                <div class="alert alert-danger">
+                    <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <div class="card accordion-wizard">
+                <div class="card-header">
+                    <h3 class="card-title">Edit Role FORM</h3>
+                </div>
+                <div class="card-body">
+                    {!! Form::model($role, ['method' => 'PATCH','route' => ['roles.update', $role->id]]) !!}
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                                <strong>Name:</strong>
+                                {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                                <strong>Permission:</strong>
+                                <br/>
+                                @foreach($permission as $value)
+                                    <label>{{ Form::checkbox('permission[]', $value->id, in_array($value->id, $rolePermissions) ? true : false, array('class' => 'name')) }}
+                                        {{ $value->name }}</label>
+                                    <br/>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                    {!! Form::close() !!}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ROW-2 CLOSED -->
+
+    @push('script')
+
+    @endpush
+@endsection

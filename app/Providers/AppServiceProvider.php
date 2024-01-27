@@ -2,27 +2,30 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
-     *
-     * @return void
+     * Register any application services.
      */
-    public function boot()
+    public function register(): void
     {
         //
     }
 
     /**
-     * Register any application services.
-     *
-     * @return void
+     * Bootstrap any application services.
      */
-    public function register()
+    public function boot(): void
     {
-        //
+        Blade::directive('canEdit', function ($expression) {
+            return "<?php if(auth()->user()->can('edit-own-user', $expression) || auth()->user()->can('admin-access')): ?>";
+        });
+
+        Blade::directive('endcanEdit', function () {
+            return '<?php endif; ?>';
+        });
     }
 }

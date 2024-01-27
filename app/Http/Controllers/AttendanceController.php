@@ -1,167 +1,117 @@
 <?php
 
-  namespace App\Http\Controllers;
+namespace App\Http\Controllers;
 
-  use App\Models\AttendanceManager;
-  use App\Models\AttendanceFilename;
-  use App\Repositories\ExportRepository;
-  use App\Repositories\ImportAttendanceData;
-  use App\Repositories\UploadRepository;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Attendance;
+use App\Imports\AttendanceImport;
 
-  use Illuminate\Http\Request;
-  use Illuminate\Support\Facades\Input;
+class AttendanceController extends Controller
+{
+    public function index(){
 
-
-  class AttendanceController extends Controller
-  {
-    public $export;
-    public $upload;
-    public $attendanceData;
-
-    /**
-     * AttendanceController constructor.
-     * @param ExportRepository $exportRepository
-     * @param UploadRepository $uploadRepository
-     * @param ImportAttendanceData $attendanceData
-     */
-    public function __construct(ExportRepository $exportRepository, UploadRepository $uploadRepository, ImportAttendanceData $attendanceData)
-    {
-      $this->export = $exportRepository;
-      $this->upload = $uploadRepository;
-      $this->attendanceData = $attendanceData;
+         $users = User::all();
+        return view('attendance.create',compact('users'));
     }
+    public function attendanceReport(Request $request){
+        $updatedDateRange = str_replace('/', '-', $request->dates);
+        $dates = explode(" - ", $updatedDateRange);
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function importAttendanceFile()
-    {
-      $files = AttendanceFilename::paginate(10);
-      return view('hrms.attendance.upload_file', compact('files'));
-    }
+        if (count($dates) == 2) {
+            $startDate = trim($dates[0]);
+             $endDate = trim($dates[1]);
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function uploadFile(Request $request)
-    {
-      if (Input::hasFile('upload_file')) {
-        $file = Input::file('upload_file');
-          $filename = $this->upload->File($file, $request->description, $request->date);
+            // Reformat the start and end dates from 'mm/dd/yyyy' to 'yyyy-mm-dd'
+            $formattedStartDate = \DateTime::createFromFormat('m-d-Y', $startDate)->format('Y-m-d');
+            $formattedEndDate = \DateTime::createFromFormat('m-d-Y', $endDate)->format('Y-m-d');
 
-        try {
-          if($filename) {
-            $this->attendanceData->Import($filename);
-          }
-        } catch(\Exception $e) {
-
-          \Session::flash('flash_message1', $e->getMessage());
-
-          \Log::info($e->getLine(). ' '. $e->getFile());
-          return redirect()->back();
+            // Add the time part to the end date
+            $formattedEndDate .= ' 23:59:59';
+        } else {
+            echo "Invalid date range format";
         }
-      }
-      else {
 
-        return redirect()->back()->with('flash_message', 'Please choose a file to upload');
-      }
+        //return $formattedEndDate;
+        $user = $request->user;
 
+        // Retrieve the user's attendance records for the specified date range.
+         $attendanceRecords = User::where('id', $user)
+            ->with(['attendance' => function ($query) use ($formattedStartDate, $formattedEndDate) {
+                $query->whereBetween('time', [$formattedStartDate, $formattedEndDate]);
+            }])
+            ->get();
 
-
-      \Session::flash('flash_message1', 'File successfully Uploaded!');
-      return redirect()->back();
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function showSheetDetails()
-    {
-      $column = '';
-      $string = '';
-      $dateFrom = '';
-      $dateTo = '';
-      $attendances = AttendanceManager::paginate(20);
-      return view('hrms.attendance.show_attendance_sheet_details', compact('attendances', 'column', 'string', 'dateFrom', 'dateTo'));
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function doDelete($id)
-    {
-      $file = AttendanceFilename::find($id);
-      $file->delete();
-
-      \Session::flash('flash_message1', 'File successfully Deleted!');
-      return redirect()->back();
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View|\Symfony\Component\HttpFoundation\BinaryFileResponse
-     */
-    public function searchAttendance(Request $request)
-    {
-      try {
-        $string = $request->string;
-        $column = $request->column;
-
-        $dateTo = date_format(date_create($request->dateTo), 'd-m-Y');
-        $dateFrom = date_format(date_create($request->dateFrom), 'd-m-Y');
-
-        if ($request->button == 'Search') {
-          /**
-           * send the post data to getFilteredSearchResults function
-           * of AttendanceManager class in Models folder
-           */
-          $attendances = AttendanceManager::getFilterdSearchResults($request->all());
-          return view('hrms.attendance.show_attendance_sheet_details', compact('attendances', 'column', 'string', 'dateFrom', 'dateTo'));
-        }
-        else
-        {
-          if ($column && $string) {
-            if ($column == 'status') {
-              $string = convertAttendanceTo($string);
+        $totalWorkingHours = 0;
+        $lastCheckIn = null;
+        foreach ($attendanceRecords as $attendance) {
+            foreach ($attendance->attendance as $record){
+                $time =$record->time;
+                $state =$record->state;
+                if ($state === 'C/In') {
+                    $lastCheckIn = $time;
+                } elseif ($state === 'C/Out' && $lastCheckIn !== null) {
+                    $checkIn = \Carbon\Carbon::parse($lastCheckIn);
+                    $checkOut = $time;
+                    $workingHours = $checkIn->diffInHours($checkOut);
+                    $totalWorkingHours += $workingHours;
+                    $lastCheckIn = null;
+                }
             }
-            $attendances = AttendanceManager::whereRaw($column . " like '%" . $string . "%'")->get();
-          } else {
-            $attendances = AttendanceManager::get();
-          }
-
-          $fileName = 'Attendance_Listing_' . rand(1, 1000). '.csv';
-          $filePath = storage_path('export/').$fileName;
-          $file = new \SplFileObject($filePath, "a");
-          $headers = ['id', 'name', 'code', 'date', 'day', 'in_time', 'out_time', 'hours_worked', 'difference', 'status', 'leave_status', 'user_id', 'created_at', 'updated_at'];
-          $file->fputcsv($headers);
-          foreach($attendances as $attendance)
-          {
-                $file->fputcsv([$attendance->id,$attendance->name,$attendance->code,$attendance->date,$attendance->day,$attendance->in_time,$attendance->out_time,$attendance->hours_worked,$attendance->difference,$attendance->status,$attendance->leave_status]);
-            }
-
-
-
-            /**
-           * sending the results fetched in above query to exportData
-           * function of ExportRepository class located in
-           * app\Repositories folder
-           */
-
-         // $fileName = $this->export->exportData($attendances, $file, $headers);
-
-          return response()->download(storage_path('export/') . $fileName);
         }
 
-      } catch (\Exception $e) {
-        return redirect()->back()->with('message', $e->getMessage());
-      }
+        return view('attendance.index', compact('attendanceRecords','totalWorkingHours'));
     }
-  }
 
+    public function uploadForm()
+    {
+        return view('upload');
+    }
 
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xls,xlsx',
+        ]);
 
+        $file = $request->file('file');
 
+        Excel::import(new AttendanceImport, $file);
 
+        return redirect()->back()->with('success', 'Attendance records uploaded successfully.');
+    }
+    public function calculateWorkingHours(Request $request)
+    {
+        $name = 'Atiq Ur Rehman'; // Change this to the desired user's name
+        $month = 10; // October
+        $year = 2023; // Change this to the desired year
 
+        $attendances = Attendance::where('name', $name)
+            ->whereMonth('time', $month)
+            ->whereYear('time', $year)
+            ->orderBy('time')
+            ->get();
+
+        $totalWorkingHours = 0;
+        $lastCheckIn = null;
+
+        foreach ($attendances as $attendance) {
+            $time = $attendance->time;
+            $state = $attendance->state;
+
+            if ($state === 'C/In') {
+                $lastCheckIn = $time;
+            } elseif ($state === 'C/Out' && $lastCheckIn !== null) {
+                $checkIn = \Carbon\Carbon::parse($lastCheckIn);
+                $checkOut = $time;
+                $workingHours = $checkIn->diffInHours($checkOut);
+                $totalWorkingHours += $workingHours;
+                $lastCheckIn = null;
+            }
+        }
+        return "Total working hours for $name in $month/$year: $totalWorkingHours hours";
+    }
+
+}

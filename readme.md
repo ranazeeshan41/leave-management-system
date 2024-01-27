@@ -1,94 +1,66 @@
-# Human Resource Management System
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
-[![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
-[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
+## About Laravel
 
-Human Resource Management System is a combination of systems and processes that connect human resource management and information technology through HRMS software.
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-Each module performs a separate function within the HRMS that helps with information gathering or tracking. HRMS modules can assist with:
-1. Employee Management
-2. Leave Management
-3. Attendance Management
-4. Team Management
-5. Asset/Resource Management 
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-## Official Documentation of Framework
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
+## Learning Laravel
 
-## Contribution for the framework
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-## Contribution for the project
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
+## Laravel Sponsors
 
-    1. Fork it
-    2. Create your feature branch (git checkout -b my-new-feature)
-    3. Make your changes
-    4. Run the tests, adding new ones for your own code if necessary (phpunit)
-    5. Commit your changes (git commit -am 'Added some feature')
-    6. Push to the branch (git push origin my-new-feature)
-    7. Create new Pull Request
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
+### Premium Partners
 
-## Security Vulnerabilities of framework
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Cubet Techno Labs](https://cubettech.com)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[Many](https://www.many.co.uk)**
+- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
+- **[DevSquad](https://devsquad.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[OP.GG](https://op.gg)**
+- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
+- **[Lendio](https://lendio.com)**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+## Contributing
 
-## Security Vulnerabilities of project
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-If you discover a security vulnerability within the project, please send an e-mail to Kanak Manjari at kanakmanjari@gmail.com. All security vulnerabilities will be promptly addressed.
+## Code of Conduct
 
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Project License
+## Security Vulnerabilities
 
-The project is available to be used freely for personal and educational purposes, cloning the project does not gives you any rights to sell it online/offline.
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
-
-## Requirement
-
-1. PHP version 5.6+
-2. [PHP Mcrypt](http://php.net/manual/en/book.mcrypt.php)
-3. [PHP Mysql](http://php.net/manual/en/ref.pdo-mysql.php)
-4. [Composer](https://getcomposer.org/)
-5. [mbstring](http://php.net/manual/en/mbstring.installation.php)
-6. [dom extention](http://php.net/manual/en/dom.setup.php)
-
-## How can I support developers ?
-* Star our GitHub repo :star:
-* Create pull requests, submit bugs, suggest new features or documentation updates :wrench:
-* Hire us for your next project :heart:
-
-## Installation
-
-It is preferred to have git setup installed on your local system.
-
-If you have git on your local, run git clone https://github.com/kmanjari/hrms.git else you can download the zip https://github.com/kmanjari/hrms/archive/master.zip
-
-Once downloaded/cloned go to the project directory on terminal/command line and run composer install or composer.phar install
-
-Once composer is installed, run migration: 
-
-    php artisan migrate
-
-After migration, run the database seeder: 
-
-    php artisan db:seed
-    
-Once done migrating and seeding you will have default user:
-
-    email: test@demo.com
-    password: 123456
-    
-Demo version of the project can be found over [here](http://hrms.kanakmanjari.com)    
-
-## Please do not change password on demo site 
-  
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
